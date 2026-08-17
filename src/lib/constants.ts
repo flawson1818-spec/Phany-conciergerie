@@ -1,7 +1,9 @@
 import type {
   ActifStatut,
+  AnnonceStatut,
   BienStatut,
   ContratStatut,
+  DemandeStatut,
   IncidentStatut,
   MandatAssetStatut,
   Metier,
@@ -10,6 +12,9 @@ import type {
   ProspectType,
   Role,
   SejourStatut,
+  SourceAnnonce,
+  StatutPaiementVisite,
+  TypeDemande,
 } from "@/generated/prisma/client";
 
 export const ROLE_LABELS: Record<Role, string> = {
@@ -181,3 +186,58 @@ export const ACTIF_STATUT_LABELS: Record<ActifStatut, string> = {
   EN_EXPLOITATION: "En exploitation",
   CEDE: "Cédé",
 };
+
+export const TYPE_DEMANDE_LABELS: Record<TypeDemande, string> = {
+  LOCATION: "Location",
+  ACHAT: "Achat",
+};
+
+export const DEMANDE_STATUT_ORDER: DemandeStatut[] = [
+  "NOUVELLE",
+  "EN_RECHERCHE",
+  "PROPOSITION_ENVOYEE",
+  "VISITE_PLANIFIEE",
+  "CONCLUE",
+  "ABANDONNEE",
+];
+
+export const DEMANDE_STATUT_LABELS: Record<DemandeStatut, string> = {
+  NOUVELLE: "Nouvelle",
+  EN_RECHERCHE: "En recherche",
+  PROPOSITION_ENVOYEE: "Proposition envoyée",
+  VISITE_PLANIFIEE: "Visite planifiée",
+  CONCLUE: "Conclue",
+  ABANDONNEE: "Abandonnée",
+};
+
+export const SOURCE_ANNONCE_LABELS: Record<SourceAnnonce, string> = {
+  FACEBOOK: "Facebook",
+  WHATSAPP: "WhatsApp",
+  SITE_WEB: "Site web",
+  TERRAIN: "Terrain",
+  AUTRE: "Autre",
+};
+
+export const ANNONCE_STATUT_LABELS: Record<AnnonceStatut, string> = {
+  DISPONIBLE: "Disponible",
+  PROPOSEE: "Proposée",
+  INDISPONIBLE: "Indisponible",
+};
+
+export const STATUT_PAIEMENT_VISITE_LABELS: Record<StatutPaiementVisite, string> = {
+  EN_ATTENTE: "En attente",
+  PAYE: "Payé",
+  ANNULE: "Annulé",
+};
+
+export const TYPES_BIEN_RECHERCHE = [
+  "Appartement",
+  "Villa",
+  "Studio",
+  "Boutique",
+  "Terrain",
+  "Maison",
+  "Entrepôt",
+  "Bureau",
+  "Autre",
+] as const;

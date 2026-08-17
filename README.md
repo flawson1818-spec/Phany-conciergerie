@@ -37,10 +37,14 @@ Seul le Fondateur peut créer de nouveaux comptes, depuis la page **Équipe**. C
 - **PHANY Asset Services** — mandats banques/institutions sur un portefeuille d'actifs ; chaque actif suit un statut (À évaluer → En remise en état → Prêt à exploiter), avec valeur estimée et budget de travaux ; un actif Prêt se convertit en un clic en bien PHANY opérationnel (checklist ménage + maintenance incluses).
 - **Authentification multi-utilisateur** — comptes nominatifs avec rôles calqués sur l'organigramme PHANY (Fondateur, Responsable opérations, Équipe ménage, Maintenance), sessions en base (cookie httpOnly, 30 jours), page **Équipe** pour créer des comptes (réservée au Fondateur). Toutes les pages et actions serveur vérifient la session ; aucune donnée n'est accessible sans être connecté.
 - **Permissions par rôle** — Fondateur et Responsable opérations ont accès complet (Prospects, Apporteurs, Corporate, Asset Services, Prestataires, finances des biens). Équipe ménage et Maintenance n'ont accès qu'au tableau de bord (vue simplifiée : incidents + biens récents), à la liste des Biens (sans les montants) et à la fiche d'un bien pour la checklist de ménage et le signalement/suivi des incidents — pas de visibilité sur le CRM ni les revenus. Contrôle appliqué à la fois sur les pages et sur chaque action serveur.
+- **Recherche de logement** — demandes clients (location ou achat : appartement, villa, boutique, terrain, maison, entrepôt, bureau...) avec budget et critères ; répertoire d'**annonces repérées** par l'équipe (Facebook, WhatsApp, sites web, terrain) ; mise en relation demande ↔ bien PHANY ou annonce externe sous forme de **proposition**, avec frais de visite et suivi de paiement (En attente → Payé), date et résultat de visite.
 
 ## Non couvert pour l'instant
 
-Volontairement hors du MVP initial pour rester livrable rapidement : channel manager / diffusion sur les plateformes de réservation (nécessiterait des accès partenaires Airbnb/Booking réels). Ce module peut être ajouté au-dessus de la même base (Prisma + Next.js).
+- **Channel manager** / diffusion sur les plateformes de réservation — nécessiterait des accès partenaires Airbnb/Booking réels.
+- **Veille automatique de Facebook/WhatsApp par IA** — ce qui a été construit à la place : un répertoire où l'équipe **enregistre manuellement** les annonces qu'elle repère, et qui alimente directement les propositions aux clients. Un vrai robot scrutant Facebook et WhatsApp en continu n'est pas quelque chose qui peut être branché ici : Facebook et WhatsApp interdisent le scraping dans leurs conditions d'utilisation et ne fournissent pas d'API publique pour parcourir des annonces ou des groupes de tiers, et une veille de ce type nécessiterait un service tournant en permanence (infrastructure, coûts récurrents, risque de blocage des comptes utilisés). Si un service de veille légal existe un jour (API officielle, prestataire spécialisé), il peut alimenter cette même table `AnnonceExterne` sans rien changer au reste de l'application.
+
+Ces modules peuvent être ajoutés au-dessus de la même base (Prisma + Next.js).
 
 ## Stack technique
 

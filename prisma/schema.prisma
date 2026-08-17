@@ -100,6 +100,40 @@ enum Role {
   MAINTENANCE
 }
 
+enum TypeDemande {
+  LOCATION
+  ACHAT
+}
+
+enum DemandeStatut {
+  NOUVELLE
+  EN_RECHERCHE
+  PROPOSITION_ENVOYEE
+  VISITE_PLANIFIEE
+  CONCLUE
+  ABANDONNEE
+}
+
+enum SourceAnnonce {
+  FACEBOOK
+  WHATSAPP
+  SITE_WEB
+  TERRAIN
+  AUTRE
+}
+
+enum AnnonceStatut {
+  DISPONIBLE
+  PROPOSEE
+  INDISPONIBLE
+}
+
+enum StatutPaiementVisite {
+  EN_ATTENTE
+  PAYE
+  ANNULE
+}
+
 model User {
   id           String    @id @default(cuid())
   name         String
@@ -185,6 +219,7 @@ model Property {
   incidents           Incident[]
   sejours             SejourCorporate[]
   actifBancaire       ActifBancaire?
+  propositions        Proposition[]
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
 }
@@ -296,4 +331,54 @@ model ActifBancaire {
   property             Property?           @relation(fields: [propertyId], references: [id])
   createdAt            DateTime            @default(now())
   updatedAt            DateTime            @updatedAt
+}
+
+model DemandeRecherche {
+  id               String        @id @default(cuid())
+  nomClient        String
+  telephoneClient  String?
+  typeDemande      TypeDemande   @default(LOCATION)
+  typeBien         String?
+  quartierSouhaite String?
+  budgetMin        Float?
+  budgetMax        Float?
+  nbChambres       Int?
+  notes            String?
+  statut           DemandeStatut @default(NOUVELLE)
+  propositions     Proposition[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model AnnonceExterne {
+  id            String        @id @default(cuid())
+  titre         String
+  source        SourceAnnonce @default(AUTRE)
+  lienOuContact String?
+  typeBien      String?
+  quartier      String?
+  prix          Float?
+  description   String?
+  statut        AnnonceStatut @default(DISPONIBLE)
+  dateRepere    DateTime      @default(now())
+  notes         String?
+  propositions  Proposition[]
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model Proposition {
+  id               String               @id @default(cuid())
+  demandeId        String
+  demande          DemandeRecherche     @relation(fields: [demandeId], references: [id], onDelete: Cascade)
+  propertyId       String?
+  property         Property?            @relation(fields: [propertyId], references: [id])
+  annonceExterneId String?
+  annonceExterne   AnnonceExterne?      @relation(fields: [annonceExterneId], references: [id])
+  fraisVisite      Float?
+  statutPaiement   StatutPaiementVisite @default(EN_ATTENTE)
+  dateVisite       DateTime?
+  resultatVisite   String?
+  createdAt        DateTime             @default(now())
+  updatedAt        DateTime             @updatedAt
 }

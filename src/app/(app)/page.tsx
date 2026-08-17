@@ -6,7 +6,14 @@ import {
   PROSPECT_STATUT_LABELS,
   PROSPECT_STATUT_ORDER,
 } from "@/lib/constants";
-import { ActifStatutBadge, BienStatutBadge, IncidentStatutBadge, PotentielBadge, ProspectStatutBadge } from "@/components/StatusBadge";
+import {
+  ActifStatutBadge,
+  BienStatutBadge,
+  DemandeStatutBadge,
+  IncidentStatutBadge,
+  PotentielBadge,
+  ProspectStatutBadge,
+} from "@/components/StatusBadge";
 import { requireUser } from "@/lib/auth";
 import { CRM_ROLES } from "@/lib/constants";
 
@@ -61,6 +68,7 @@ export default async function DashboardPage() {
     incidentsOuverts,
     sejoursEnCours,
     actifsEnRemiseEnEtat,
+    demandesActives,
   } = await getDashboardData();
 
   const totalActifs = Object.entries(pipelineCounts)
@@ -147,7 +155,7 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
         <GoalCard
           label="Nouveaux prospects aujourd'hui"
           value={newProspectsToday}
@@ -183,6 +191,11 @@ export default async function DashboardPage() {
           <p className="text-sm font-medium text-neutral-500">Actifs en remise en état</p>
           <p className="mt-1 text-3xl font-semibold text-neutral-900">{actifsEnRemiseEnEtat.length}</p>
           <p className="mt-3 text-xs text-neutral-400">Portefeuille banques/institutions à évaluer ou en travaux</p>
+        </div>
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <p className="text-sm font-medium text-neutral-500">Demandes de recherche</p>
+          <p className="mt-1 text-3xl font-semibold text-neutral-900">{demandesActives.length}</p>
+          <p className="mt-3 text-xs text-neutral-400">Clients en recherche de location, achat ou autre bien</p>
         </div>
       </div>
 
@@ -295,6 +308,29 @@ export default async function DashboardPage() {
                     <p className="text-xs text-neutral-400">{a.mandat.institution}</p>
                   </div>
                   <ActifStatutBadge statut={a.statut} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+          <h2 className="mb-4 text-sm font-semibold text-neutral-900">🔍 Demandes de recherche</h2>
+          {demandesActives.length === 0 ? (
+            <p className="text-sm text-neutral-400">Aucune demande active pour le moment.</p>
+          ) : (
+            <ul className="divide-y divide-neutral-100">
+              {demandesActives.slice(0, 8).map((d) => (
+                <li key={d.id} className="flex items-center justify-between gap-3 py-2.5">
+                  <div>
+                    <Link href={`/recherche/${d.id}`} className="text-sm font-medium text-neutral-900 hover:underline">
+                      {d.nomClient}
+                    </Link>
+                    <p className="text-xs text-neutral-400">
+                      {d.typeBien ?? "—"} {d.quartierSouhaite ? `· ${d.quartierSouhaite}` : ""}
+                    </p>
+                  </div>
+                  <DemandeStatutBadge statut={d.statut} />
                 </li>
               ))}
             </ul>

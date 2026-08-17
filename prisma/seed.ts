@@ -16,6 +16,9 @@ function daysFromNow(days: number) {
 async function main() {
   await prisma.session.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.proposition.deleteMany();
+  await prisma.demandeRecherche.deleteMany();
+  await prisma.annonceExterne.deleteMany();
   await prisma.actifBancaire.deleteMany();
   await prisma.mandatAssetServices.deleteMany();
   await prisma.sejourCorporate.deleteMany();
@@ -304,6 +307,69 @@ async function main() {
       potentiel: "FAIBLE",
       notes: "Ne souhaite pas déléguer la gestion pour le moment.",
       dernierContact: daysFromNow(-10),
+    },
+  });
+
+  const annonceFacebook = await prisma.annonceExterne.create({
+    data: {
+      titre: "Villa 3 chambres meublée à louer - Baguida",
+      source: "FACEBOOK",
+      lienOuContact: "+228 98 11 22 33 (via groupe Facebook 'Immobilier Lomé')",
+      typeBien: "Villa",
+      quartier: "Baguida",
+      prix: 400000,
+      description: "Repérée dans un groupe Facebook d'annonces immobilières, propriétaire à contacter directement.",
+      notes: "À vérifier sur place avant de proposer au client.",
+    },
+  });
+
+  await prisma.annonceExterne.create({
+    data: {
+      titre: "Boutique à louer - Grand Marché",
+      source: "WHATSAPP",
+      lienOuContact: "+228 99 22 33 44",
+      typeBien: "Boutique",
+      quartier: "Grand Marché",
+      prix: 150000,
+      description: "Partagée dans un groupe WhatsApp de commerçants.",
+    },
+  });
+
+  const demande1 = await prisma.demandeRecherche.create({
+    data: {
+      nomClient: "Mme Essi Dogbevi",
+      telephoneClient: "+228 91 33 44 55",
+      typeDemande: "LOCATION",
+      typeBien: "Villa",
+      quartierSouhaite: "Baguida",
+      budgetMin: 300000,
+      budgetMax: 450000,
+      nbChambres: 3,
+      notes: "Cherche à emménager rapidement, famille de 4 personnes.",
+      statut: "EN_RECHERCHE",
+    },
+  });
+
+  await prisma.proposition.create({
+    data: {
+      demandeId: demande1.id,
+      annonceExterneId: annonceFacebook.id,
+      fraisVisite: 5000,
+      statutPaiement: "EN_ATTENTE",
+    },
+  });
+
+  await prisma.demandeRecherche.create({
+    data: {
+      nomClient: "M. Kossi Amétowoyona",
+      telephoneClient: "+228 92 55 66 77",
+      typeDemande: "ACHAT",
+      typeBien: "Terrain",
+      quartierSouhaite: "Agoè",
+      budgetMin: 10000000,
+      budgetMax: 20000000,
+      notes: "Cherche un terrain pour construction, titre foncier exigé.",
+      statut: "NOUVELLE",
     },
   });
 

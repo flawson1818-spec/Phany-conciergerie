@@ -26,6 +26,7 @@ export async function getDashboardData() {
     incidentsOuverts,
     sejoursEnCours,
     actifsEnRemiseEnEtat,
+    demandesActives,
   ] = await Promise.all([
     prisma.prospect.count({ where: { createdAt: { gte: todayStart, lte: todayEnd } } }),
     prisma.interaction.count({ where: { date: { gte: todayStart, lte: todayEnd } } }),
@@ -58,6 +59,10 @@ export async function getDashboardData() {
       include: { mandat: true },
       orderBy: { createdAt: "asc" },
     }),
+    prisma.demandeRecherche.findMany({
+      where: { statut: { notIn: ["CONCLUE", "ABANDONNEE"] } },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   const pipelineCounts = Object.fromEntries(
@@ -74,5 +79,6 @@ export async function getDashboardData() {
     incidentsOuverts,
     sejoursEnCours,
     actifsEnRemiseEnEtat,
+    demandesActives,
   };
 }

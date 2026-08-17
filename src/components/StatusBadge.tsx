@@ -1,24 +1,30 @@
 import {
   ACTIF_STATUT_LABELS,
+  ANNONCE_STATUT_LABELS,
   BIEN_STATUT_LABELS,
   CONTRAT_STATUT_LABELS,
+  DEMANDE_STATUT_LABELS,
   INCIDENT_STATUT_LABELS,
   MANDAT_ASSET_STATUT_LABELS,
   POTENTIEL_LABELS,
   PROSPECT_STATUT_LABELS,
   ROLE_LABELS,
   SEJOUR_STATUT_LABELS,
+  STATUT_PAIEMENT_VISITE_LABELS,
 } from "@/lib/constants";
 import type {
   ActifStatut,
+  AnnonceStatut,
   BienStatut,
   ContratStatut,
+  DemandeStatut,
   IncidentStatut,
   MandatAssetStatut,
   Potentiel,
   ProspectStatut,
   Role,
   SejourStatut,
+  StatutPaiementVisite,
 } from "@/generated/prisma/client";
 
 const PROSPECT_STATUT_COLORS: Record<ProspectStatut, string> = {
@@ -89,6 +95,27 @@ const ROLE_COLORS: Record<Role, string> = {
   MAINTENANCE: "bg-orange-100 text-orange-700",
 };
 
+const DEMANDE_STATUT_COLORS: Record<DemandeStatut, string> = {
+  NOUVELLE: "bg-neutral-100 text-neutral-700",
+  EN_RECHERCHE: "bg-blue-100 text-blue-700",
+  PROPOSITION_ENVOYEE: "bg-fuchsia-100 text-fuchsia-700",
+  VISITE_PLANIFIEE: "bg-orange-100 text-orange-700",
+  CONCLUE: "bg-emerald-100 text-emerald-700",
+  ABANDONNEE: "bg-red-100 text-red-700",
+};
+
+const ANNONCE_STATUT_COLORS: Record<AnnonceStatut, string> = {
+  DISPONIBLE: "bg-emerald-100 text-emerald-700",
+  PROPOSEE: "bg-amber-100 text-amber-700",
+  INDISPONIBLE: "bg-neutral-100 text-neutral-500",
+};
+
+const STATUT_PAIEMENT_VISITE_COLORS: Record<StatutPaiementVisite, string> = {
+  EN_ATTENTE: "bg-amber-100 text-amber-700",
+  PAYE: "bg-emerald-100 text-emerald-700",
+  ANNULE: "bg-neutral-100 text-neutral-500",
+};
+
 function Badge({ className, children }: { className: string; children: React.ReactNode }) {
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${className}`}>
@@ -131,4 +158,16 @@ export function ActifStatutBadge({ statut }: { statut: ActifStatut }) {
 
 export function RoleBadge({ role }: { role: Role }) {
   return <Badge className={ROLE_COLORS[role]}>{ROLE_LABELS[role]}</Badge>;
+}
+
+export function DemandeStatutBadge({ statut }: { statut: DemandeStatut }) {
+  return <Badge className={DEMANDE_STATUT_COLORS[statut]}>{DEMANDE_STATUT_LABELS[statut]}</Badge>;
+}
+
+export function AnnonceStatutBadge({ statut }: { statut: AnnonceStatut }) {
+  return <Badge className={ANNONCE_STATUT_COLORS[statut]}>{ANNONCE_STATUT_LABELS[statut]}</Badge>;
+}
+
+export function StatutPaiementVisiteBadge({ statut }: { statut: StatutPaiementVisite }) {
+  return <Badge className={STATUT_PAIEMENT_VISITE_COLORS[statut]}>{STATUT_PAIEMENT_VISITE_LABELS[statut]}</Badge>;
 }
