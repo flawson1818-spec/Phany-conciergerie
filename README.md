@@ -6,7 +6,9 @@ Application interne pour piloter la prospection de propriétaires (méthode 10×
 
 ```bash
 npm install
-npm run db:seed   # charge des données d'exemple (optionnel, écrase la base actuelle)
+cp .env.example .env        # puis renseigner DATABASE_URL avec une vraie base PostgreSQL
+npx prisma migrate dev --name init   # crée les tables (première fois uniquement)
+npm run db:seed              # charge des données d'exemple (optionnel)
 npm run dev
 ```
 
@@ -42,9 +44,25 @@ Volontairement hors du MVP initial pour rester livrable rapidement : channel man
 
 ## Stack technique
 
-Next.js 16 (App Router, Server Actions), Prisma 7 + SQLite (fichier local `prisma/dev.db`, migrable vers PostgreSQL en changeant le provider et l'adapter), Tailwind CSS.
+Next.js 16 (App Router, Server Actions), Prisma 7 + PostgreSQL (adaptateur `@prisma/adapter-pg`, compatible avec n'importe quel Postgres standard : Neon, Supabase, Railway, RDS...), Tailwind CSS.
 
 ## Base de données
 
 - `npx prisma studio` — interface visuelle pour explorer/modifier les données directement.
-- `npx prisma migrate dev --name <nom>` — après toute modification de `prisma/schema.prisma`.
+- `npx prisma migrate dev --name <nom>` — après toute modification de `prisma/schema.prisma`, en local.
+- `npx prisma migrate deploy` — applique les migrations en attente sans les recréer (utilisé automatiquement au déploiement, voir ci-dessous).
+
+## Déploiement (Vercel)
+
+1. **Créer le dépôt GitHub** : sur github.com, créer un dépôt vide, puis depuis `phany-app/` :
+   ```bash
+   git remote add origin <url-de-votre-depot>
+   git branch -M main
+   git push -u origin main
+   ```
+2. **Importer sur Vercel** : sur vercel.com/new, importer le dépôt GitHub. Vercel détecte Next.js automatiquement.
+3. **Variable d'environnement** : dans les réglages du projet Vercel, ajouter `DATABASE_URL` avec la chaîne de connexion PostgreSQL de production.
+4. **Build** : le script `vercel-build` (`prisma migrate deploy && next build`) s'exécute automatiquement à chaque déploiement — les migrations en attente sont appliquées avant le build, sans jamais réinitialiser les données.
+5. **Premier déploiement** : le tout premier déploiement nécessite qu'un dossier `prisma/migrations` existe dans le dépôt (créé localement via `npx prisma migrate dev --name init` avant le premier `git push`).
+
+Après déploiement, changez le mot de passe des comptes de test avant tout usage réel.
