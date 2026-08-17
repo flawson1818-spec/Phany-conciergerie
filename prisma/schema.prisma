@@ -1,0 +1,299 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProspectType {
+  PROPRIETAIRE_MEUBLE
+  PROPRIETAIRE_DIASPORA
+  AGENCE
+  INVESTISSEUR
+  ENTREPRISE
+  INSTITUTION_BANQUE
+}
+
+enum ProspectStatut {
+  NOUVEAU
+  CONTACTE
+  REPONDU
+  RENDEZ_VOUS
+  VISITE
+  PROPOSITION
+  NEGOCIATION
+  MANDAT_SIGNE
+  BIEN_ACTIF
+  PERDU
+}
+
+enum Potentiel {
+  FAIBLE
+  MOYEN
+  ELEVE
+  PRIORITAIRE
+}
+
+enum BienStatut {
+  EN_PREPARATION
+  PRET
+  ACTIF
+  INACTIF
+}
+
+enum ChecklistStatut {
+  EN_COURS
+  TERMINE
+}
+
+enum Metier {
+  PLOMBIER
+  ELECTRICIEN
+  CLIMATISATION
+  SERRURIER
+  MENUISIER
+  PEINTRE
+  ELECTROMENAGER
+  AUTRE
+}
+
+enum IncidentStatut {
+  SIGNALE
+  ASSIGNE
+  EN_COURS
+  RESOLU
+}
+
+enum ContratStatut {
+  ACTIF
+  INACTIF
+  EXPIRE
+}
+
+enum SejourStatut {
+  PLANIFIE
+  EN_COURS
+  TERMINE
+  ANNULE
+}
+
+enum MandatAssetStatut {
+  ACTIF
+  INACTIF
+  TERMINE
+}
+
+enum ActifStatut {
+  A_EVALUER
+  EN_REMISE_EN_ETAT
+  PRET
+  EN_EXPLOITATION
+  CEDE
+}
+
+enum Role {
+  FONDATEUR
+  RESPONSABLE_OPERATIONS
+  MENAGE
+  MAINTENANCE
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         Role      @default(RESPONSABLE_OPERATIONS)
+  createdAt    DateTime  @default(now())
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+model Apporteur {
+  id            String     @id @default(cuid())
+  nom           String
+  telephone     String?
+  structure     String?
+  commissionPct Float?
+  notes         String?
+  createdAt     DateTime   @default(now())
+  prospects     Prospect[]
+}
+
+model Prospect {
+  id                String                @id @default(cuid())
+  nom               String
+  telephone         String?
+  type              ProspectType          @default(PROPRIETAIRE_MEUBLE)
+  source            String?
+  quartier          String?
+  typeBien          String?
+  nbChambres        Int?
+  meuble            Boolean               @default(false)
+  disponible        Boolean               @default(false)
+  statut            ProspectStatut        @default(NOUVEAU)
+  potentiel         Potentiel             @default(MOYEN)
+  notes             String?
+  dernierContact    DateTime?
+  prochaineRelance  DateTime?
+  apporteurId       String?
+  apporteur         Apporteur?            @relation(fields: [apporteurId], references: [id])
+  interactions      Interaction[]
+  properties        Property[]
+  contratsCorporate ContratCorporate[]
+  mandatsAsset      MandatAssetServices[]
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+}
+
+model Interaction {
+  id               String    @id @default(cuid())
+  prospectId       String
+  prospect         Prospect  @relation(fields: [prospectId], references: [id], onDelete: Cascade)
+  type             String
+  note             String?
+  date             DateTime  @default(now())
+  prochaineRelance DateTime?
+  createdAt        DateTime  @default(now())
+}
+
+model Property {
+  id                  String            @id @default(cuid())
+  nom                 String
+  adresse             String?
+  quartier            String?
+  typeBien            String?
+  nbChambres          Int?
+  statut              BienStatut        @default(EN_PREPARATION)
+  loyerEstime         Float?
+  chargesMensuelles   Float?
+  commissionPct       Float             @default(20)
+  mandatDateSignature DateTime?
+  prospectId          String?
+  prospect            Prospect?         @relation(fields: [prospectId], references: [id])
+  checklists          ChecklistMenage[]
+  incidents           Incident[]
+  sejours             SejourCorporate[]
+  actifBancaire       ActifBancaire?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+}
+
+model ChecklistMenage {
+  id          String          @id @default(cuid())
+  propertyId  String
+  property    Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  items       String
+  statut      ChecklistStatut @default(EN_COURS)
+  completedBy String?
+  date        DateTime        @default(now())
+  createdAt   DateTime        @default(now())
+}
+
+model Prestataire {
+  id        String     @id @default(cuid())
+  nom       String
+  metier    Metier     @default(AUTRE)
+  telephone String?
+  zone      String?
+  notes     String?
+  incidents Incident[]
+  createdAt DateTime   @default(now())
+}
+
+model Incident {
+  id             String         @id @default(cuid())
+  propertyId     String
+  property       Property       @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  description    String
+  statut         IncidentStatut @default(SIGNALE)
+  prestataireId  String?
+  prestataire    Prestataire?   @relation(fields: [prestataireId], references: [id])
+  photoUrl       String?
+  noteResolution String?
+  signaleLe      DateTime       @default(now())
+  resoluLe       DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model ContratCorporate {
+  id               String            @id @default(cuid())
+  entreprise       String
+  contactNom       String?
+  contactTelephone String?
+  contactEmail     String?
+  statut           ContratStatut     @default(ACTIF)
+  tarifNuitee      Float?
+  dateDebut        DateTime          @default(now())
+  dateFin          DateTime?
+  notes            String?
+  prospectId       String?
+  prospect         Prospect?         @relation(fields: [prospectId], references: [id])
+  sejours          SejourCorporate[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model SejourCorporate {
+  id               String           @id @default(cuid())
+  contratId        String
+  contrat          ContratCorporate @relation(fields: [contratId], references: [id], onDelete: Cascade)
+  propertyId       String
+  property         Property         @relation(fields: [propertyId], references: [id])
+  collaborateurNom String
+  dateArrivee      DateTime
+  dateDepart       DateTime?
+  statut           SejourStatut     @default(PLANIFIE)
+  notes            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model MandatAssetServices {
+  id               String            @id @default(cuid())
+  institution      String
+  contactNom       String?
+  contactTelephone String?
+  contactEmail     String?
+  statut           MandatAssetStatut @default(ACTIF)
+  honorairesPct    Float?
+  dateDebut        DateTime          @default(now())
+  dateFin          DateTime?
+  notes            String?
+  prospectId       String?
+  prospect         Prospect?         @relation(fields: [prospectId], references: [id])
+  actifs           ActifBancaire[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model ActifBancaire {
+  id                   String              @id @default(cuid())
+  mandatId             String
+  mandat               MandatAssetServices @relation(fields: [mandatId], references: [id], onDelete: Cascade)
+  nom                  String
+  adresse              String?
+  quartier             String?
+  typeBien             String?
+  nbChambres           Int?
+  statut               ActifStatut         @default(A_EVALUER)
+  valeurEstimee        Float?
+  budgetRemiseEnEtat   Float?
+  coutRemiseEnEtatReel Float?
+  notes                String?
+  propertyId           String?             @unique
+  property             Property?           @relation(fields: [propertyId], references: [id])
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+}
