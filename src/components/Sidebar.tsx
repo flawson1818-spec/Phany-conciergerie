@@ -8,6 +8,7 @@ import type { Role } from "@/generated/prisma/client";
 
 const links = [
   { href: "/", label: "Tableau de bord", icon: "📊", crmOnly: false },
+  { href: "/studio", label: "Studio IA", icon: "🎵", crmOnly: false },
   { href: "/prospects", label: "Prospects", icon: "🎯", crmOnly: true },
   { href: "/recherche", label: "Recherche", icon: "🔍", crmOnly: true },
   { href: "/biens", label: "Biens", icon: "🏠", crmOnly: false },
